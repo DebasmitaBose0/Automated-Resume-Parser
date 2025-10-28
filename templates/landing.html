@@ -1,0 +1,1832 @@
+{% extends "base.html" %}
+
+{% block title %}Automated Resume Parser{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+    <!-- Hero Section with Login Integration -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center align-items-center min-vh-100">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="hero-title mb-4">
+                            <span id="typewriter-title" class="typewriter-text"></span>
+                        </h1>
+                        <p class="hero-subtitle mb-5">
+                            <span id="typewriter-subtitle" class="typewriter-subtitle"></span>
+                        </p>
+                        <div class="feature-highlights mb-5" id="feature-highlights" style="opacity: 0;">
+                            <div class="feature-item" id="feature-1">
+                                <i class="fas fa-users me-2"></i>
+                                <span id="typewriter-feature-1"></span>
+                            </div>
+                            <div class="feature-item" id="feature-2">
+                                <i class="fas fa-brain me-2"></i>
+                                <span id="typewriter-feature-2"></span>
+                            </div>
+                            <div class="feature-item" id="feature-3">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                <span id="typewriter-feature-3"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 offset-lg-1">
+                    <!-- Integrated Login Form -->
+                    <div class="login-card">
+                        <div class="login-header text-center mb-4">
+                            <i class="fas fa-user-circle login-icon mb-3"></i>
+                            <h3>Welcome Back</h3>
+                            <p>Sign in to access the resume parser</p>
+                        </div>
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form method="POST" action="{{ url_for('auth.login') }}" class="login-form">
+                            {{ csrf_token() if csrf_token }}
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                                <label for="email"><i class="fas fa-envelope me-2"></i>Email address</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                                <label for="password"><i class="fas fa-lock me-2"></i>Password</label>
+                            </div>
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="remember_me" name="remember_me">
+                                <label class="form-check-label" for="remember_me">
+                                    Remember me
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-gradient w-100 mb-3">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        </form>
+
+                        <div class="text-center">
+                            <p class="mb-3">Don't have an account?</p>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-light w-100">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-lg-12">
+                    <h2 class="section-title">Powerful Features for HR Teams</h2>
+                    <p class="section-subtitle">Everything you need to streamline your recruitment process</p>
+                    <div class="title-divider"></div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="card-glow"></div>
+                                <div class="feature-icon-container">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-upload"></i>
+                                    </div>
+                                    <div class="icon-ripple"></div>
+                                </div>
+                                <h4>Smart Upload</h4>
+                                <p>Upload and process resumes instantly with intelligent parsing.</p>
+                                <div class="feature-stats">
+                                    <span class="stat-badge">
+                                        <i class="fas fa-file-alt me-1"></i>
+                                        Multiple Formats
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="card-glow"></div>
+                                <div class="back-content">
+                                    <div class="back-icon">
+                                        <i class="fas fa-upload"></i>
+                                    </div>
+                                    <h4>Smart Upload Details</h4>
+                                    <ul class="feature-details">
+                                        <li><i class="fas fa-check"></i> Support for PDF, DOC, DOCX formats</li>
+                                        <li><i class="fas fa-check"></i> Automatic text extraction</li>
+                                        <li><i class="fas fa-check"></i> Batch upload capability</li>
+                                        <li><i class="fas fa-check"></i> Real-time processing</li>
+                                        <li><i class="fas fa-check"></i> Error validation & feedback</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="card-glow"></div>
+                                <div class="feature-icon-container">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <div class="icon-ripple"></div>
+                                </div>
+                                <h4>AI Analysis</h4>
+                                <p>Advanced AI algorithms extract structured data from resumes.</p>
+                                <div class="feature-stats">
+                                    <span class="stat-badge">
+                                        <i class="fas fa-robot me-1"></i>
+                                        AI Powered
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="card-glow"></div>
+                                <div class="back-content">
+                                    <div class="back-icon">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <h4>AI Analysis Features</h4>
+                                    <ul class="feature-details">
+                                        <li><i class="fas fa-check"></i> Contact information extraction</li>
+                                        <li><i class="fas fa-check"></i> Skills & competencies mapping</li>
+                                        <li><i class="fas fa-check"></i> Work experience parsing</li>
+                                        <li><i class="fas fa-check"></i> Education details extraction</li>
+                                        <li><i class="fas fa-check"></i> Language detection & processing</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="card-glow"></div>
+                                <div class="feature-icon-container">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <div class="icon-ripple"></div>
+                                </div>
+                                <h4>Smart Search</h4>
+                                <p>Find perfect candidates with intelligent search capabilities.</p>
+                                <div class="feature-stats">
+                                    <span class="stat-badge">
+                                        <i class="fas fa-lightning-bolt me-1"></i>
+                                        Instant Results
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="card-glow"></div>
+                                <div class="back-content">
+                                    <div class="back-icon">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                    <h4>Smart Search Capabilities</h4>
+                                    <ul class="feature-details">
+                                        <li><i class="fas fa-check"></i> Skills-based filtering</li>
+                                        <li><i class="fas fa-check"></i> Experience level matching</li>
+                                        <li><i class="fas fa-check"></i> Location & availability search</li>
+                                        <li><i class="fas fa-check"></i> Keyword matching algorithm</li>
+                                        <li><i class="fas fa-check"></i> Advanced filter combinations</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="card-glow"></div>
+                                <div class="feature-icon-container">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="icon-ripple"></div>
+                                </div>
+                                <h4>Team Collaboration</h4>
+                                <p>Collaborate with your team for better hiring decisions.</p>
+                                <div class="feature-stats">
+                                    <span class="stat-badge">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        Secure Access
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="card-glow"></div>
+                                <div class="back-content">
+                                    <div class="back-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <h4>Collaboration Features</h4>
+                                    <ul class="feature-details">
+                                        <li><i class="fas fa-check"></i> Multi-user access control</li>
+                                        <li><i class="fas fa-check"></i> Shared candidate database</li>
+                                        <li><i class="fas fa-check"></i> Team notes & comments</li>
+                                        <li><i class="fas fa-check"></i> Role-based permissions</li>
+                                        <li><i class="fas fa-check"></i> Secure data encryption</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <h3>
+                            <i class="fas fa-robot me-2"></i>
+                            Automated Resume Parser
+                        </h3>
+                        <p class="footer-description">
+                            Transform your hiring process with AI-powered resume analysis. 
+                            Extract, analyze, and collaborate efficiently with your team.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-links">
+                        <h5><i class="fas fa-cube me-2"></i>Product</h5>
+                        <ul>
+                            <li><a href="{{ url_for('main.index') }}#features">Features</a></li>
+                            <li><a href="{{ url_for('main.pricing') }}">Pricing</a></li>
+                            <li><a href="{{ url_for('main.api_docs') }}">API Documentation</a></li>
+                            <li><a href="{{ url_for('main.integrations') }}">Integrations</a></li>
+                            <li><a href="{{ url_for('main.changelog') }}">Changelog</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-links">
+                        <h5><i class="fas fa-building me-2"></i>Company</h5>
+                        <ul>
+                            <li><a href="{{ url_for('main.about') }}">About Us</a></li>
+                            <li><a href="{{ url_for('main.careers') }}">Careers</a></li>
+                            <li><a href="{{ url_for('main.blog') }}">Blog</a></li>
+                            <li><a href="{{ url_for('main.press') }}">Press Kit</a></li>
+                            <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-links">
+                        <h5><i class="fas fa-headset me-2"></i>Support</h5>
+                        <ul>
+                            <li><a href="{{ url_for('main.help') }}">Help Center</a></li>
+                            <li><a href="{{ url_for('main.faq') }}">FAQ</a></li>
+                            <li><a href="{{ url_for('main.status') }}">System Status</a></li>
+                            <li><a href="{{ url_for('main.contact') }}">Get Support</a></li>
+                            <li><a href="{{ url_for('main.roadmap') }}">Product Roadmap</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <div class="footer-links">
+                        <h5><i class="fas fa-file-contract me-2"></i>Legal</h5>
+                        <ul>
+                            <li><a href="{{ url_for('main.privacy') }}">Privacy Policy</a></li>
+                            <li><a href="{{ url_for('main.terms') }}">Terms of Service</a></li>
+                            <li><a href="{{ url_for('main.cookies') }}">Cookie Policy</a></li>
+                            <li><a href="{{ url_for('main.security') }}">Security</a></li>
+                            <li><a href="{{ url_for('main.licenses') }}">Open Licenses</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="copyright">
+                            © 2025 Automated Resume Parser. All rights reserved.
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="footer-badges">
+                            <span class="security-badge">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Secure & Private
+                            </span>
+                            <span class="security-badge">
+                                <i class="fas fa-lock me-1"></i>
+                                GDPR Compliant
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </footer>
+</div>
+
+<style>
+.landing-page {
+    min-height: 100vh;
+}
+
+.hero-section {
+    background: var(--bg-gradient);
+    position: relative;
+    overflow: hidden;
+    padding: 60px 0;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 2rem;
+}
+
+.gradient-text {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+}
+
+.feature-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.feature-item {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.feature-item i {
+    color: var(--primary-color);
+    width: 20px;
+}
+
+/* Login Card Styling */
+.login-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 2;
+}
+
+.login-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+}
+
+.login-header h3 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0;
+}
+
+.form-floating > label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    backdrop-filter: blur(10px);
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    color: var(--text-primary);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-check-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-gradient {
+    background: var(--accent-gradient);
+    border: none;
+    border-radius: 12px;
+    padding: 15px 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-light {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 12px 30px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+.features-section {
+    padding: 100px 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+        rgba(255, 255, 255, 0.02);
+    position: relative;
+    overflow: hidden;
+}
+
+.features-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+    opacity: 0.3;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    position: relative;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.title-divider {
+    width: 100px;
+    height: 4px;
+    background: var(--accent-gradient);
+    margin: 2rem auto 4rem;
+    border-radius: 2px;
+    position: relative;
+}
+
+.title-divider::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+}
+
+.title-divider::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+}
+
+/* Flip Card Styles */
+.flip-card {
+    background-color: transparent;
+    width: 100%;
+    height: 400px;
+    perspective: 1000px;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.flip-card-front {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.flip-card-back {
+    background: rgba(255, 255, 255, 0.12);
+    transform: rotateY(180deg);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.flip-card-front::before, .flip-card-back::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(0, 0, 0, 0.02) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.flip-card:hover .flip-card-front::before,
+.flip-card:hover .flip-card-back::before {
+    opacity: 1;
+}
+
+.card-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.flip-card:hover .card-glow {
+    opacity: 1;
+}
+
+.feature-icon-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.feature-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--accent-gradient);
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 2.5rem;
+    color: white;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 10px 30px rgba(102, 126, 234, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.flip-card:hover .feature-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 
+        0 15px 40px rgba(102, 126, 234, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.icon-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: 25px;
+    opacity: 0;
+    animation: ripple 2s infinite;
+}
+
+@keyframes ripple {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.flip-card h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.flip-card:hover h4 {
+    color: #fff;
+}
+
+.flip-card p {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.flip-card:hover p {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.feature-stats {
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.stat-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.flip-card:hover .stat-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Back Card Specific Styles */
+.back-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: center;
+}
+
+.back-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--accent-gradient);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 
+        0 10px 30px rgba(102, 126, 234, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.feature-details {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    width: 100%;
+}
+
+.feature-details li {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    line-height: 1.4;
+}
+
+.feature-details li i {
+    color: var(--primary-color);
+    margin-right: 0.8rem;
+    font-size: 0.8rem;
+    width: 12px;
+}
+
+.flip-card-back h4 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+}
+
+/* Footer Styles */
+.main-footer {
+    background: linear-gradient(135deg, 
+        rgba(10, 10, 20, 0.98) 0%,
+        rgba(20, 20, 35, 0.98) 50%,
+        rgba(15, 15, 28, 0.98) 100%);
+    border-top: 1px solid rgba(102, 126, 234, 0.2);
+    padding: 80px 0 30px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 100px;
+}
+
+.footer-brand h3 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+}
+
+.footer-brand h3 i {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.footer-description {
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.7;
+    margin-bottom: 0;
+    max-width: 350px;
+    font-size: 0.9rem;
+}
+
+.footer-links {
+    position: relative;
+}
+
+.footer-links h5 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.footer-links h5 i {
+    color: var(--primary-color);
+    margin-right: 0.6rem;
+    font-size: 1rem;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links ul li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-links ul li a {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    display: inline-block;
+}
+
+.footer-links ul li a:hover {
+    color: var(--primary-color);
+    transform: translateX(3px);
+}
+
+.footer-divider {
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%,
+        rgba(102, 126, 234, 0.3) 20%,
+        rgba(102, 126, 234, 0.3) 80%,
+        transparent 100%);
+    margin: 2.5rem 0 2rem;
+}
+
+.footer-bottom {
+    padding-top: 1.5rem;
+}
+
+.copyright {
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.footer-badges {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.security-badge {
+    background: rgba(102, 126, 234, 0.15);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.security-badge:hover {
+    background: rgba(102, 126, 234, 0.25);
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateY(-2px);
+}
+
+.security-badge i {
+    margin-right: 0.4rem;
+}
+
+.footer-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(102, 126, 234, 0.4);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+.particle:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
+.particle:nth-child(2) { top: 60%; left: 85%; animation-delay: 2s; }
+.particle:nth-child(3) { top: 80%; left: 40%; animation-delay: 4s; }
+.particle:nth-child(4) { top: 40%; left: 70%; animation-delay: 1s; }
+.particle:nth-child(5) { top: 15%; left: 90%; animation-delay: 3s; }
+
+/* Light theme footer */
+body.light-theme .main-footer {
+    background: linear-gradient(135deg, 
+        rgba(248, 249, 250, 0.95) 0%,
+        rgba(233, 236, 239, 0.95) 50%,
+        rgba(228, 231, 235, 0.95) 100%);
+    border-top-color: rgba(52, 152, 219, 0.2);
+}
+
+body.light-theme .footer-brand h3 {
+    color: #2c3e50;
+}
+
+body.light-theme .footer-description {
+    color: #6c757d;
+}
+
+body.light-theme .footer-links h5 {
+    color: #2c3e50;
+}
+
+body.light-theme .footer-links ul li a {
+    color: #495057;
+}
+
+body.light-theme .footer-links ul li a:hover {
+    color: #3498db;
+}
+
+body.light-theme .copyright {
+    color: #95a5a6;
+}
+
+body.light-theme .security-badge {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2c3e50;
+    border-color: rgba(52, 152, 219, 0.3);
+}
+
+body.light-theme .security-badge:hover {
+    background: rgba(52, 152, 219, 0.2);
+    border-color: rgba(52, 152, 219, 0.5);
+}
+
+@media (max-width: 768px) {
+    .main-footer {
+        padding: 60px 0 20px;
+        margin-top: 60px;
+    }
+    
+    .footer-badges {
+        justify-content: flex-start;
+        margin-top: 1.5rem;
+    }
+    
+    .footer-links h5 {
+        margin-bottom: 1.2rem;
+        font-size: 0.85rem;
+    }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+    50% { transform: translateY(-20px) rotate(180deg); opacity: 0.5; }
+}
+
+/* Light theme adjustments */
+body.light-theme .features-section {
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(231, 76, 60, 0.1) 0%, transparent 50%),
+        rgba(248, 249, 250, 0.8);
+}
+
+body.light-theme .section-title {
+    color: #2c3e50;
+}
+
+body.light-theme .section-subtitle {
+    color: #6c757d;
+}
+
+body.light-theme .flip-card-front, 
+body.light-theme .flip-card-back {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .flip-card-back {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(52, 152, 219, 0.3);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .flip-card h4 {
+    color: #2c3e50;
+}
+
+body.light-theme .flip-card p {
+    color: #6c757d;
+}
+
+body.light-theme .flip-card-back h4 {
+    color: #2c3e50;
+}
+
+body.light-theme .feature-details li {
+    color: #495057;
+}
+
+body.light-theme .stat-label {
+    color: #495057;
+}
+
+body.light-theme .main-footer {
+    background: linear-gradient(135deg, 
+        rgba(248, 249, 250, 0.95) 0%,
+        rgba(233, 236, 239, 0.95) 100%);
+    border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .footer-brand h3 {
+    color: #2c3e50;
+}
+
+body.light-theme .footer-description {
+    color: #6c757d;
+}
+
+body.light-theme .footer-links h5 {
+    color: #2c3e50;
+}
+
+body.light-theme .footer-links ul li a {
+    color: #6c757d;
+}
+
+body.light-theme .copyright {
+    color: #adb5bd;
+}
+
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2.2rem;
+    }
+    
+    .flip-card {
+        height: 350px;
+    }
+    
+    .footer-badges {
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .footer-badges .security-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+body.light-theme .login-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+body.light-theme .login-header h3 {
+    color: #2c3e50;
+}
+
+body.light-theme .login-header p {
+    color: #6c757d;
+}
+
+body.light-theme .form-floating > label {
+    color: #6c757d;
+}
+
+body.light-theme .form-control {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.2);
+    color: #2c3e50;
+}
+
+body.light-theme .form-control:focus {
+    background: rgba(255, 255, 255, 0.95);
+    color: #2c3e50;
+}
+
+body.light-theme .form-check-label {
+    color: #495057;
+}
+
+body.light-theme .hero-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.light-theme .feature-item {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Typewriter Effect Styling */
+.typewriter-text {
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+}
+
+.typewriter-text::after {
+    content: '|';
+    color: var(--primary-color);
+    animation: blink 1s infinite;
+    font-weight: normal;
+}
+
+.typewriter-text.typing-complete::after {
+    display: none;
+}
+
+.typewriter-subtitle {
+    display: inline-block;
+    position: relative;
+}
+
+.typewriter-subtitle::after {
+    content: '|';
+    color: rgba(255, 255, 255, 0.8);
+    animation: blink 1s infinite;
+    font-weight: normal;
+}
+
+.typewriter-subtitle.typing-complete::after {
+    display: none;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.feature-item {
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.5s ease;
+}
+
+.feature-item.animate-in {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.feature-item i {
+    opacity: 0;
+    animation: iconFadeIn 0.5s ease forwards;
+}
+
+@keyframes iconFadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Light theme typewriter cursor */
+body.light-theme .typewriter-text::after {
+    color: #3498db;
+}
+
+body.light-theme .typewriter-subtitle::after {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Page Wrapper Styles */
+.page-wrapper {
+    min-height: calc(100vh - 200px);
+    padding-top: 30px;
+}
+
+.page-hero {
+    background: linear-gradient(135deg,
+        rgba(102, 126, 234, 0.15) 0%,
+        rgba(255, 107, 107, 0.1) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 80px 0;
+    margin-bottom: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.content-section {
+    padding: 60px 0;
+}
+
+.content-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+}
+
+.content-section h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+}
+
+.content-section p {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.content-section ul {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 2;
+    margin-bottom: 2rem;
+    padding-left: 1.5rem;
+}
+
+.content-section ul li {
+    margin-bottom: 0.8rem;
+}
+
+.content-section a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.content-section a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+/* Pricing Page Styles */
+.pricing-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(102, 126, 234, 0.4);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+}
+
+.pricing-card.featured {
+    border: 2px solid rgba(102, 126, 234, 0.5);
+    transform: scale(1.05);
+}
+
+.plan-badge {
+    display: inline-block;
+    background: rgba(102, 126, 234, 0.2);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.plan-badge.popular {
+    background: var(--accent-gradient);
+    color: white;
+}
+
+.pricing-card h3 {
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.pricing-card h3 span {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.plan-description {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.features-list li {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.features-list li i {
+    color: var(--primary-color);
+    margin-right: 0.8rem;
+    font-size: 0.9rem;
+}
+
+/* Legal Content */
+.legal-content {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Contact Page */
+.contact-form {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2rem;
+}
+
+.contact-info {
+    padding: 2rem;
+}
+
+.info-item {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.info-item i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    min-width: 30px;
+}
+
+.info-item h5 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.info-item p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0;
+}
+
+/* Status and Other Page Items */
+.status-summary {
+    background: rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.faq-item,
+.changelog-item,
+.job-listing,
+.blog-post,
+.press-item,
+.help-section,
+.integration-item,
+.roadmap-item,
+.security-content {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Light Theme Page Styles */
+body.light-theme .page-hero {
+    background: linear-gradient(135deg,
+        rgba(52, 152, 219, 0.1) 0%,
+        rgba(231, 76, 60, 0.1) 100%);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .page-title {
+    color: #2c3e50;
+}
+
+body.light-theme .page-subtitle {
+    color: #6c757d;
+}
+
+body.light-theme .content-section h2,
+body.light-theme .content-section h3,
+body.light-theme .content-section h4 {
+    color: #2c3e50;
+}
+
+body.light-theme .content-section p,
+body.light-theme .content-section ul {
+    color: #495057;
+}
+
+body.light-theme .pricing-card,
+body.light-theme .legal-content,
+body.light-theme .contact-form,
+body.light-theme .faq-item,
+body.light-theme .changelog-item,
+body.light-theme .job-listing,
+body.light-theme .blog-post,
+body.light-theme .press-item,
+body.light-theme .help-section,
+body.light-theme .integration-item,
+body.light-theme .roadmap-item,
+body.light-theme .security-content {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .pricing-card h3,
+body.light-theme .contact-info h3,
+body.light-theme .faq-item h4,
+body.light-theme .changelog-item h4 {
+    color: #2c3e50;
+}
+
+body.light-theme .info-item p {
+    color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .login-card {
+        margin-top: 2rem;
+        padding: 2rem;
+    }
+    
+    .feature-highlights {
+        margin-bottom: 3rem;
+    }
+}
+</style>
+
+<script>
+// Typewriter Effect Implementation
+class TypeWriter {
+    constructor(element, words, speed = 100) {
+        this.element = element;
+        this.words = words;
+        this.speed = speed;
+        this.currentWord = 0;
+        this.currentChar = 0;
+        this.isDeleting = false;
+    }
+
+    type() {
+        const currentText = this.words[this.currentWord];
+        
+        if (this.isDeleting) {
+            this.element.textContent = currentText.substring(0, this.currentChar - 1);
+            this.currentChar--;
+        } else {
+            this.element.textContent = currentText.substring(0, this.currentChar + 1);
+            this.currentChar++;
+        }
+
+        let typeSpeed = this.isDeleting ? this.speed / 2 : this.speed;
+
+        if (!this.isDeleting && this.currentChar === currentText.length) {
+            typeSpeed = 2000; // Pause at end
+            this.isDeleting = true;
+        } else if (this.isDeleting && this.currentChar === 0) {
+            this.isDeleting = false;
+            this.currentWord = (this.currentWord + 1) % this.words.length;
+            typeSpeed = 500;
+        }
+
+        setTimeout(() => this.type(), typeSpeed);
+    }
+}
+
+// Simple typewriter for single text
+function typeText(element, text, speed = 50, callback = null) {
+    let i = 0;
+    element.textContent = '';
+    
+    function typeChar() {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
+            setTimeout(typeChar, speed);
+        } else {
+            element.classList.add('typing-complete');
+            if (callback) callback();
+        }
+    }
+    
+    typeChar();
+}
+
+// Animate features one by one
+function animateFeatures() {
+    const features = [
+        { element: document.getElementById('typewriter-feature-1'), text: 'Multi-user Collaboration' },
+        { element: document.getElementById('typewriter-feature-2'), text: 'AI-Powered Analysis' },
+        { element: document.getElementById('typewriter-feature-3'), text: 'Secure & Private' }
+    ];
+
+    function animateNext(index) {
+        if (index < features.length) {
+            const feature = features[index];
+            const featureItem = feature.element.closest('.feature-item');
+            
+            // Show the feature item
+            featureItem.classList.add('animate-in');
+            
+            // Type the text
+            setTimeout(() => {
+                typeText(feature.element, feature.text, 50, () => {
+                    // Animate the icon
+                    const icon = featureItem.querySelector('i');
+                    icon.style.animationDelay = '0.2s';
+                    
+                    // Move to next feature
+                    setTimeout(() => animateNext(index + 1), 300);
+                });
+            }, 200);
+        }
+    }
+    
+    // Show feature highlights container and start animation
+    document.getElementById('feature-highlights').style.opacity = '1';
+    animateNext(0);
+}
+
+// Initialize typewriter effects when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Main title typewriter
+    const titleElement = document.getElementById('typewriter-title');
+    
+    // Create the title with line break
+    function typeTitle() {
+        const line1 = 'AI-Powered';
+        const line2 = 'Resume Parser';
+        
+        typeText(titleElement, line1, 80, () => {
+            titleElement.innerHTML += '<br>';
+            titleElement.classList.remove('typing-complete');
+            
+            const currentText = titleElement.textContent;
+            let i = 0;
+            function typeLine2() {
+                if (i < line2.length) {
+                    titleElement.textContent = line1 + line2.substring(0, i + 1);
+                    titleElement.innerHTML = line1 + '<br>' + line2.substring(0, i + 1);
+                    i++;
+                    setTimeout(typeLine2, 80);
+                } else {
+                    titleElement.classList.add('typing-complete');
+                    // After title is complete, start subtitle
+                    setTimeout(() => {
+                        const subtitleElement = document.getElementById('typewriter-subtitle');
+                        typeText(subtitleElement, 'Transform your hiring process with intelligent resume analysis. Extract structured data, search candidates efficiently, and collaborate with your team to make better hiring decisions.', 30, () => {
+                            // After subtitle is complete, start features
+                            setTimeout(() => {
+                                animateFeatures();
+                            }, 500);
+                        });
+                    }, 800);
+                }
+            }
+            setTimeout(typeLine2, 200);
+        });
+    }
+    
+    typeTitle();
+    
+    // Initialize enhanced animations
+    new EnhancedAnimations();
+    
+    // Initialize particles
+    createParticles();
+});
+
+// Enhanced Animations and Effects
+class EnhancedAnimations {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.setupFlipCardEffects();
+        this.setupRippleEffect();
+        this.setupScrollAnimations();
+    }
+
+    setupFlipCardEffects() {
+        const flipCards = document.querySelectorAll('.flip-card');
+        
+        flipCards.forEach(card => {
+            // Add smooth transition effects
+            card.addEventListener('mouseenter', () => {
+                const cardGlow = card.querySelector('.card-glow');
+                if (cardGlow) {
+                    cardGlow.style.opacity = '1';
+                }
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                const cardGlow = card.querySelector('.card-glow');
+                if (cardGlow) {
+                    cardGlow.style.opacity = '0';
+                }
+            });
+        });
+    }
+
+    setupRippleEffect() {
+        const cards = document.querySelectorAll('.flip-card');
+        
+        cards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.width = '0';
+                ripple.style.height = '0';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+                ripple.style.transform = 'translate(-50%, -50%)';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.animation = 'ripple-expand 0.6s ease-out';
+                ripple.style.zIndex = '1000';
+                
+                card.style.position = 'relative';
+                card.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+        
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple-expand {
+                to {
+                    width: 300px;
+                    height: 300px;
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    setupScrollAnimations() {
+        const elements = document.querySelectorAll('.flip-card, .footer-brand, .footer-links');
+        
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        elements.forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(element);
+        });
+    }
+}
+
+// Particle animation for footer
+function createParticles() {
+    const footerParticles = document.querySelector('.footer-particles');
+    if (!footerParticles) return;
+    
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 6 + 's';
+        particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        footerParticles.appendChild(particle);
+    }
+}
+</script>
+{% endblock %}

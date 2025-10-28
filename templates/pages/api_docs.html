@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}API Documentation - Automated Resume Parser{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-hero">
+        <div class="container">
+            <h1 class="page-title">API Documentation</h1>
+            <p class="page-subtitle">Build powerful integrations with our REST API</p>
+        </div>
+    </div>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="documentation-content">
+                        <h2>Getting Started</h2>
+                        <p>Our API allows you to programmatically upload and analyze resumes. Get started with your API key today.</p>
+                        
+                        <h3>Authentication</h3>
+                        <p>All API requests require authentication using an API key in the header.</p>
+                        <pre><code>Authorization: Bearer YOUR_API_KEY</code></pre>
+                        
+                        <h3>Endpoints</h3>
+                        <ul class="api-endpoints">
+                            <li><strong>POST /api/upload</strong> - Upload and parse a resume</li>
+                            <li><strong>GET /api/candidates</strong> - List all candidates</li>
+                            <li><strong>GET /api/candidates/:id</strong> - Get candidate details</li>
+                            <li><strong>POST /api/search</strong> - Search candidates</li>
+                        </ul>
+                        
+                        <p><a href="#" class="btn btn-primary">View Full Documentation</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="sidebar">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="#">API Reference</a></li>
+                            <li><a href="#">Code Examples</a></li>
+                            <li><a href="#">SDKs</a></li>
+                            <li><a href="#">Rate Limits</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

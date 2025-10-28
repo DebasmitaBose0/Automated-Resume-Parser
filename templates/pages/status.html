@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}System Status - Automated Resume Parser{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-hero">
+        <div class="container">
+            <h1 class="page-title">System Status</h1>
+            <p class="page-subtitle">Real-time service status and incident reports</p>
+        </div>
+    </div>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="status-summary">
+                <h3>All Systems Operational</h3>
+                <p>✓ API: Operational | ✓ Web Portal: Operational | ✓ Database: Operational</p>
+            </div>
+            
+            <h4>Incident History</h4>
+            <p>No recent incidents reported.</p>
+            
+            <h4>Scheduled Maintenance</h4>
+            <p>No scheduled maintenance at this time.</p>
+        </div>
+    </section>
+</div>
+{% endblock %}

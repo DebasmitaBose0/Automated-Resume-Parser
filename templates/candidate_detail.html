@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Details{% endblock %}
+
+{% block content %}
+<div id="loading" class="text-center">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div id="candidate-details" style="display: none;">
+    <!-- Candidate details will be loaded here -->
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const candidateId = {{ candidate_id }};
+
+// Load candidate details
+function loadCandidateDetails() {
+    fetch(`/api/candidates/${candidateId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Candidate not found');
+            }
+            return response.json();
+        })
+        .then(candidate => {
+            document.getElementById('loading').style.display = 'none';
+            
+            const detailsHtml = `
+                <!-- Header with Member Name -->
+                <div class="mb-5 pb-4 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="display-5 fw-bold mb-2">
+                                <i class="bi bi-person-circle"></i> ${candidate.name || 'Unknown'}
+                            </h1>
+                            <div class="text-muted">
+                                <p class="mb-1">
+                                    <i class="bi bi-envelope"></i> <strong>Email:</strong> ${candidate.email || 'Not provided'}
+                                </p>
+                                <p class="mb-1">
+                                    <i class="bi bi-telephone"></i> <strong>Phone:</strong> ${candidate.phone || 'Not provided'}
+                                </p>
+                                ${candidate.location ? `<p class="mb-1"><i class="bi bi-geo-alt"></i> <strong>Location:</strong> ${candidate.location}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <a href="/candidates" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> BACK TO LIST
+                            </a>
+                            <button class="btn btn-outline-danger" onclick="deleteCandidate()">
+                                <i class="bi bi-trash"></i> DELETE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Professional Summary -->
+                        ${candidate.summary ? `
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0"><i class="bi bi-file-text"></i> Professional Summary</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>${candidate.summary.replace(/\\n/g, '<br>')}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Education -->
+                        ${candidate.educations.length > 0 ? `
+                            <div class="card mb-4 shadow-sm border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0"><i class="bi bi-mortarboard"></i> Education & Qualifications</h5>
+                                </div>
+                                <div class="card-body">
+                                    ${candidate.educations.map((edu, idx) => `
+                                        <div class="education-entry mb-4 ${idx !== candidate.educations.length - 1 ? 'pb-4 border-bottom' : ''}">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="flex-shrink-0">
+                                                    <div class="bg-info bg-opacity-10 rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="bi bi-book text-info fs-5"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <div>
+                                                            <h6 class="fw-bold text-info mb-0">${edu.degree || 'Degree'}</h6>
+                                                            ${edu.field_of_study ? `<p class="mb-1 text-muted"><strong>Field:</strong> ${edu.field_of_study}</p>` : ''}
+                                                        </div>
+                                                    </div>
+                                                    <div class="details-group">
+                                                        <p class="mb-1">
+                                                            <i class="bi bi-building text-primary"></i> 
+                                                            <strong>Institution:</strong> ${edu.institution || 'Not specified'}
+                                                        </p>
+                                                        ${edu.location ? `
+                                                            <p class="mb-1">
+                                                                <i class="bi bi-geo-alt text-primary"></i>
+                                                                <strong>Location:</strong> ${edu.location}
+                                                            </p>
+                                                        ` : ''}
+                                                        <p class="mb-1">
+                                                            <i class="bi bi-calendar2-event text-primary"></i>
+                                                            <strong>Duration:</strong> ${edu.start_date || 'Unknown'} - ${edu.end_date || 'Present'}
+                                                        </p>
+                                                        ${edu.gpa ? `
+                                                            <p class="mb-1">
+                                                                <i class="bi bi-star-fill text-warning"></i>
+                                                                <strong>GPA:</strong> ${edu.gpa}
+                                                            </p>
+                                                        ` : ''}
+                                                        ${edu.description ? `
+                                                            <p class="mb-0">
+                                                                <i class="bi bi-file-text text-primary"></i>
+                                                                <strong>Details:</strong> ${edu.description}
+                                                            </p>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Work Experience -->
+                        ${candidate.experiences.length > 0 ? `
+                            <div class="card mb-4 shadow-sm border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><i class="bi bi-briefcase"></i> Work Experience (${candidate.experiences.length} Position${candidate.experiences.length !== 1 ? 's' : ''})</h5>
+                                </div>
+                                <div class="card-body">
+                                    ${candidate.experiences.map((exp, idx) => `
+                                        <div class="experience-entry mb-4 ${idx !== candidate.experiences.length - 1 ? 'pb-4 border-bottom' : ''}">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="flex-shrink-0">
+                                                    <div class="bg-success bg-opacity-10 rounded-circle p-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="bi bi-briefcase text-success fs-5"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <div>
+                                                            <h6 class="fw-bold text-success mb-0">${exp.job_title || 'Position'}</h6>
+                                                            <p class="mb-1"><strong>Company:</strong> ${exp.company || 'Not specified'}</p>
+                                                        </div>
+                                                        ${exp.is_current ? '<span class="badge bg-success text-white">Currently Working</span>' : ''}
+                                                    </div>
+                                                    <div class="details-group">
+                                                        <p class="mb-1">
+                                                            <i class="bi bi-building text-primary"></i> 
+                                                            <strong>Company:</strong> ${exp.company || 'Not specified'}
+                                                        </p>
+                                                        ${exp.location ? `
+                                                            <p class="mb-1">
+                                                                <i class="bi bi-geo-alt text-primary"></i>
+                                                                <strong>Location:</strong> ${exp.location}
+                                                            </p>
+                                                        ` : ''}
+                                                        <p class="mb-1">
+                                                            <i class="bi bi-calendar2-event text-primary"></i>
+                                                            <strong>Duration:</strong> ${exp.start_date || 'Unknown'} - ${exp.is_current ? 'Present' : (exp.end_date || 'Unknown')}
+                                                        </p>
+                                                        ${exp.description ? `
+                                                            <div class="mt-2">
+                                                                <p class="mb-1">
+                                                                    <i class="bi bi-list-check text-primary"></i>
+                                                                    <strong>Responsibilities & Achievements:</strong>
+                                                                </p>
+                                                                <div class="ps-4">
+                                                                    <p class="mb-0 text-muted" style="color: rgba(255, 255, 255, 0.8) !important;">
+                                                                        ${exp.description.replace(/\\n/g, '<br>&nbsp;&nbsp;&nbsp;&nbsp;')}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="card mb-4 shadow-sm border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h5 class="mb-0"><i class="bi bi-briefcase"></i> Professional Journey</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="py-3 px-2">
+                                        <div class="d-flex align-items-start gap-3 mb-3">
+                                            <div class="flex-shrink-0">
+                                                <img src="{{ url_for('static', filename='logo.svg') }}" alt="Logo" style="width: 60px; height: 60px; display: block; filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));">
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="fw-bold text-info mb-2">Early Career & Academic Excellence</h6>
+                                                <p style="color: rgba(255, 255, 255, 0.85); line-height: 1.6; font-size: 0.95rem;">
+                                                    Although I am at the beginning of my professional journey, I have gained substantial hands-on experience through academic coursework, personal projects, and collaborative learning initiatives. I have developed full-stack web applications utilizing <strong>Flask, React, and SQL</strong>, and have explored advanced areas including data analysis with Pandas and NumPy, API development, and database optimization. These experiences have strengthened my understanding of software architecture, collaborative development practices, and systematic problem-solving approaches.
+                                                </p>
+                                                <p style="color: rgba(255, 255, 255, 0.85); line-height: 1.6; font-size: 0.95rem; margin-bottom: 0;">
+                                                    I am passionate about software development and continuously strive to expand my technical expertise through real-world challenges, open-source contributions, and emerging technologies. My strong foundation in core programming languages and web development frameworks positions me to make meaningful contributions to innovative projects. I am eager to apply my analytical and technical skills in a professional environment while growing as a developer.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <!-- Skills Section - EXPANDED -->
+                        ${candidate.skills.length > 0 ? `
+                            <div class="card mb-4 shadow-sm border-warning sticky-top" style="top: 20px;">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5 class="mb-0"><i class="bi bi-gear"></i> Skills & Competencies (${candidate.skills.length} Total)</h5>
+                                </div>
+                                <div class="card-body">
+                                    ${getSkillsByDetailedCategory(candidate.skills)}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Quick Stats Card -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Quick Stats</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span><strong>Total Skills</strong></span>
+                                        <span class="badge bg-primary fs-6">${candidate.skills.length}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span><strong>Education</strong></span>
+                                        <span class="badge bg-info fs-6">${candidate.educations.length}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span><strong>Work Experience</strong></span>
+                                        <span class="badge bg-success fs-6">${candidate.experiences.length}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><strong>Total Years</strong></span>
+                                        <span class="badge bg-warning text-dark fs-6">${calculateTotalExperience(candidate.experiences)} yrs</span>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="small text-muted">
+                                    <p class="mb-1"><i class="bi bi-file"></i> <strong>File:</strong> ${candidate.original_filename}</p>
+                                    <p class="mb-0"><i class="bi bi-calendar"></i> <strong>Added:</strong> ${new Date(candidate.created_at).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('candidate-details').innerHTML = detailsHtml;
+            document.getElementById('candidate-details').style.display = 'block';
+        })
+        .catch(error => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('candidate-details').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    Error loading candidate details. The candidate may not exist or there was a server error.
+                    <br>
+                    <a href="/candidates" class="btn btn-secondary mt-2">Back to Candidates</a>
+                </div>
+            `;
+            document.getElementById('candidate-details').style.display = 'block';
+        });
+}
+
+// Group skills by category with enhanced styling
+function getSkillsByCategory(skills) {
+    const categories = {};
+    
+    skills.forEach(skill => {
+        const category = skill.category || 'Other';
+        if (!categories[category]) {
+            categories[category] = [];
+        }
+        categories[category].push(skill);
+    });
+    
+    let html = '';
+    Object.entries(categories).forEach(([category, categorySkills]) => {
+        const categoryIcons = {
+            'Technical': '<i class="bi bi-laptop"></i>',
+            'Soft': '<i class="bi bi-chat-quote"></i>',
+            'Other': '<i class="bi bi-tag"></i>'
+        };
+        
+        html += `
+            <div class="mb-3">
+                <h6 class="mb-2 pb-1 border-bottom">
+                    <span>${categoryIcons[category] || '<i class="bi bi-tag"></i>'}</span>
+                    ${category.charAt(0).toUpperCase() + category.slice(1)}
+                </h6>
+                <div class="d-flex flex-wrap gap-2">
+                    ${categorySkills.map(skill => `
+                        <span class="badge bg-secondary">${skill.name}</span>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    return html || '<p class="text-muted"><i class="bi bi-info-circle"></i> No skills extracted</p>';
+}
+
+// Enhanced detailed skills display
+function getSkillsByDetailedCategory(skills) {
+    const categories = {};
+    
+    skills.forEach(skill => {
+        const category = skill.category || 'Other';
+        if (!categories[category]) {
+            categories[category] = [];
+        }
+        categories[category].push(skill);
+    });
+    
+    const categoryIcons = {
+        'technical': '<i class="bi bi-laptop text-primary"></i>',
+        'soft': '<i class="bi bi-chat-dots text-success"></i>',
+        'other': '<i class="bi bi-tag text-secondary"></i>'
+    };
+    
+    let html = '';
+    
+    Object.entries(categories).forEach(([category, categorySkills]) => {
+        const icon = categoryIcons[category.toLowerCase()] || categoryIcons['other'];
+        html += `
+            <div class="skill-category mb-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    ${icon}
+                    <h6 class="mb-0 fw-bold">${category.charAt(0).toUpperCase() + category.slice(1)} Skills (${categorySkills.length})</h6>
+                </div>
+                <div class="skill-list">
+                    ${categorySkills.map(skill => `
+                        <div class="skill-item mb-2">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="badge bg-info text-dark fs-6" style="cursor: default;">
+                                    ${skill.name}
+                                </span>
+                                ${skill.proficiency ? `<small class="text-muted">${skill.proficiency}</small>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    return html || '<p class="text-muted"><i class="bi bi-info-circle"></i> No skills extracted</p>';
+}
+
+// Calculate total experience in years
+function calculateTotalExperience(experiences) {
+    let totalMonths = 0;
+    
+    experiences.forEach(exp => {
+        if (exp.start_date && (exp.end_date || exp.is_current)) {
+            const startYear = parseInt(exp.start_date) || new Date().getFullYear();
+            const endYear = exp.is_current ? new Date().getFullYear() : (parseInt(exp.end_date) || startYear);
+            totalMonths += (endYear - startYear) * 12;
+        }
+    });
+    
+    return Math.max(0, Math.round(totalMonths / 12));
+}
+
+// Delete candidate
+function deleteCandidate() {
+    if (confirm('Are you sure you want to delete this candidate? This action cannot be undone.')) {
+        fetch(`/api/candidates/${candidateId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error deleting candidate: ' + data.error);
+            } else {
+                alert('Candidate deleted successfully');
+                window.location.href = '/candidates';
+            }
+        })
+        .catch(error => {
+            alert('Error deleting candidate. Please try again.');
+        });
+    }
+}
+
+// Load candidate details on page load
+document.addEventListener('DOMContentLoaded', loadCandidateDetails);
+</script>
+{% endblock %}

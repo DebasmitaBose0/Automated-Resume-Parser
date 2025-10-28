@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded background -->
+  <rect width="64" height="64" rx="12" fill="url(#bgGradient)"/>
+  
+  <!-- Document/Resume icon -->
+  <g transform="translate(16, 10)">
+    <!-- Paper -->
+    <rect x="0" y="0" width="32" height="44" rx="2" fill="white" opacity="0.95"/>
+    
+    <!-- Lines representing text -->
+    <line x1="4" y1="6" x2="28" y2="6" stroke="#667eea" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="4" y1="12" x2="28" y2="12" stroke="#667eea" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="4" y1="18" x2="28" y2="18" stroke="#667eea" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="4" y1="24" x2="20" y2="24" stroke="#764ba2" stroke-width="1.5" stroke-linecap="round"/>
+    
+    <!-- AI/Robot indicator (small circuit-like elements) -->
+    <circle cx="22" cy="32" r="2" fill="#f093fb"/>
+    <circle cx="26" cy="32" r="2" fill="#f093fb"/>
+    <line x1="24" y1="30" x2="24" y2="34" stroke="#f093fb" stroke-width="1"/>
+  </g>
+  
+  <!-- Checkmark overlay (for verification) -->
+  <g transform="translate(34, 36)">
+    <circle r="10" fill="#feca57" opacity="0.9"/>
+    <path d="M -3 0 L 2 5 L 7 -2" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

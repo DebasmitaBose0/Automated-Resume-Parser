@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing - Automated Resume Parser{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-hero">
+        <div class="container">
+            <h1 class="page-title">Simple, Transparent Pricing</h1>
+            <p class="page-subtitle">Choose the perfect plan for your hiring needs</p>
+        </div>
+    </div>
+
+    <section class="pricing-section">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="pricing-card">
+                        <div class="plan-badge">Starter</div>
+                        <h3>$29<span>/month</span></h3>
+                        <p class="plan-description">Perfect for small teams</p>
+                        <ul class="features-list">
+                            <li><i class="fas fa-check"></i> Up to 100 resume uploads/month</li>
+                            <li><i class="fas fa-check"></i> 5 team members</li>
+                            <li><i class="fas fa-check"></i> Basic search filters</li>
+                            <li><i class="fas fa-check"></i> Email support</li>
+                        </ul>
+                        <button class="btn btn-primary w-100">Get Started</button>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="pricing-card featured">
+                        <div class="plan-badge popular">Most Popular</div>
+                        <h3>$79<span>/month</span></h3>
+                        <p class="plan-description">For growing companies</p>
+                        <ul class="features-list">
+                            <li><i class="fas fa-check"></i> Unlimited resume uploads</li>
+                            <li><i class="fas fa-check"></i> 20 team members</li>
+                            <li><i class="fas fa-check"></i> Advanced search & filters</li>
+                            <li><i class="fas fa-check"></i> Priority support</li>
+                            <li><i class="fas fa-check"></i> API access</li>
+                        </ul>
+                        <button class="btn btn-primary w-100">Start Free Trial</button>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="pricing-card">
+                        <div class="plan-badge">Enterprise</div>
+                        <h3>Custom<span>/month</span></h3>
+                        <p class="plan-description">For large organizations</p>
+                        <ul class="features-list">
+                            <li><i class="fas fa-check"></i> Unlimited everything</li>
+                            <li><i class="fas fa-check"></i> Unlimited team members</li>
+                            <li><i class="fas fa-check"></i> Custom integrations</li>
+                            <li><i class="fas fa-check"></i> Dedicated support</li>
+                            <li><i class="fas fa-check"></i> SLA guarantee</li>
+                        </ul>
+                        <button class="btn btn-outline-primary w-100">Contact Sales</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

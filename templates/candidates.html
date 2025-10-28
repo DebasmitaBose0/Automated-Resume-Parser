@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}All Candidates{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-people"></i> All Candidates</h2>
+    <a href="{{ url_for('main.upload_page') }}" class="btn btn-primary">
+        <i class="bi bi-plus"></i> Add New Candidate
+    </a>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" id="search-input" placeholder="Search candidates...">
+            <button class="btn btn-outline-secondary" type="button" id="search-btn">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-4">
+                <select class="form-select" id="skill-filter">
+                    <option value="">Filter by skill</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="company-filter">
+                    <option value="">Filter by company</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="education-filter">
+                    <option value="">Filter by education</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading" class="text-center">
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div id="candidates-container" style="display: none;">
+    <!-- Candidates will be loaded here -->
+</div>
+
+<nav id="pagination-container" style="display: none;">
+    <!-- Pagination will be loaded here -->
+</nav>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPage = 1;
+let currentFilters = {};
+
+// Load candidates
+function loadCandidates(page = 1, filters = {}) {
+    const loadingDiv = document.getElementById('loading');
+    const candidatesContainer = document.getElementById('candidates-container');
+    const paginationContainer = document.getElementById('pagination-container');
+    
+    loadingDiv.style.display = 'block';
+    candidatesContainer.style.display = 'none';
+    paginationContainer.style.display = 'none';
+    
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('page', page);
+    params.append('per_page', 12);
+    
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value) params.append(key, value);
+    });
+    
+    fetch(`/api/candidates?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            loadingDiv.style.display = 'none';
+            
+            if (data.candidates.length === 0) {
+                candidatesContainer.innerHTML = `
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle"></i> No candidates found. 
+                        <a href="${window.location.origin}/upload">Upload a resume</a> to get started.
+                    </div>
+                `;
+            } else {
+                candidatesContainer.innerHTML = `
+                    <div class="row">
+                        ${data.candidates.map(candidate => `
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a href="/candidate/${candidate.id}" class="text-decoration-none">
+                                                ${candidate.name}
+                                            </a>
+                                        </h5>
+                                        <p class="card-text">
+                                            ${candidate.email ? `<i class="bi bi-envelope"></i> ${candidate.email}<br>` : ''}
+                                            ${candidate.phone ? `<i class="bi bi-telephone"></i> ${candidate.phone}<br>` : ''}
+                                            ${candidate.location ? `<i class="bi bi-geo-alt"></i> ${candidate.location}` : ''}
+                                        </p>
+                                        
+                                        ${candidate.skills.length > 0 ? `
+                                            <div class="mb-2">
+                                                <small class="text-muted">Skills:</small><br>
+                                                ${candidate.skills.slice(0, 3).map(skill => 
+                                                    `<span class="badge bg-secondary skill-badge">${skill.name}</span>`
+                                                ).join('')}
+                                                ${candidate.skills.length > 3 ? `<span class="badge bg-light text-dark">+${candidate.skills.length - 3} more</span>` : ''}
+                                            </div>
+                                        ` : ''}
+                                        
+                                        ${candidate.experiences.length > 0 ? `
+                                            <div class="mb-2">
+                                                <small class="text-muted">Latest Position:</small><br>
+                                                <small>${candidate.experiences[0].job_title} at ${candidate.experiences[0].company}</small>
+                                            </div>
+                                        ` : ''}
+                                        
+                                        <small class="text-muted">
+                                            <i class="bi bi-calendar"></i> Added ${new Date(candidate.created_at).toLocaleDateString()}
+                                        </small>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="d-flex justify-content-between">
+                                            <a href="/candidate/${candidate.id}" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCandidate(${candidate.id})">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Build pagination
+                if (data.pages > 1) {
+                    let paginationHtml = '<ul class="pagination justify-content-center">';
+                    
+                    // Previous button
+                    paginationHtml += `
+                        <li class="page-item ${data.current_page === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="#" onclick="loadCandidates(${data.current_page - 1}, currentFilters)">Previous</a>
+                        </li>
+                    `;
+                    
+                    // Page numbers
+                    for (let i = 1; i <= data.pages; i++) {
+                        if (i === data.current_page || i === 1 || i === data.pages || 
+                            (i >= data.current_page - 1 && i <= data.current_page + 1)) {
+                            paginationHtml += `
+                                <li class="page-item ${i === data.current_page ? 'active' : ''}">
+                                    <a class="page-link" href="#" onclick="loadCandidates(${i}, currentFilters)">${i}</a>
+                                </li>
+                            `;
+                        } else if (i === data.current_page - 2 || i === data.current_page + 2) {
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    
+                    // Next button
+                    paginationHtml += `
+                        <li class="page-item ${data.current_page === data.pages ? 'disabled' : ''}">
+                            <a class="page-link" href="#" onclick="loadCandidates(${data.current_page + 1}, currentFilters)">Next</a>
+                        </li>
+                    `;
+                    
+                    paginationHtml += '</ul>';
+                    paginationContainer.innerHTML = paginationHtml;
+                    paginationContainer.style.display = 'block';
+                }
+            }
+            
+            candidatesContainer.style.display = 'block';
+        })
+        .catch(error => {
+            loadingDiv.style.display = 'none';
+            candidatesContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Error loading candidates. Please try again.
+                </div>
+            `;
+            candidatesContainer.style.display = 'block';
+        });
+}
+
+// Delete candidate
+function deleteCandidate(candidateId) {
+    if (confirm('Are you sure you want to delete this candidate? This action cannot be undone.')) {
+        fetch(`/api/candidates/${candidateId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error deleting candidate: ' + data.error);
+            } else {
+                loadCandidates(currentPage, currentFilters);
+            }
+        })
+        .catch(error => {
+            alert('Error deleting candidate. Please try again.');
+        });
+    }
+}
+
+// Search functionality
+document.getElementById('search-btn').addEventListener('click', function() {
+    const query = document.getElementById('search-input').value.trim();
+    if (query) {
+        window.location.href = `/search?q=${encodeURIComponent(query)}`;
+    }
+});
+
+document.getElementById('search-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('search-btn').click();
+    }
+});
+
+// Filter functionality
+document.getElementById('skill-filter').addEventListener('change', function() {
+    currentFilters.skill = this.value;
+    currentPage = 1;
+    loadCandidates(currentPage, currentFilters);
+});
+
+document.getElementById('company-filter').addEventListener('change', function() {
+    currentFilters.company = this.value;
+    currentPage = 1;
+    loadCandidates(currentPage, currentFilters);
+});
+
+document.getElementById('education-filter').addEventListener('change', function() {
+    currentFilters.education = this.value;
+    currentPage = 1;
+    loadCandidates(currentPage, currentFilters);
+});
+
+// Load initial data
+loadCandidates();
+</script>
+{% endblock %}

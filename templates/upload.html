@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Resume{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-cloud-upload"></i> Upload Resume</h4>
+                <p class="mb-0 text-muted">Upload candidate resumes to extract and analyze professional information</p>
+            </div>
+            <div class="card-body">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Select Resume File</label>
+                        <input type="file" class="form-control" id="file" name="file" 
+                               accept=".pdf,.doc,.docx" required>
+                        <div class="form-text">
+                            Supported formats: PDF, DOC, DOCX (Max size: 16MB)
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-upload"></i> Upload and Process
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="loading" class="text-center mt-3" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <p class="mt-2">Processing resume, please wait...</p>
+                </div>
+                
+                <div id="result" class="mt-3" style="display: none;">
+                    <!-- Results will be displayed here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>What happens when you upload?</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-file-text"></i> Text Extraction</h6>
+                        <p class="small">We extract text content from your resume using advanced PDF and document processing.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-brain"></i> AI Analysis</h6>
+                        <p class="small">Our NLP engine analyzes the text to identify names, skills, education, and experience.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-database"></i> Secure Storage</h6>
+                        <p class="small">Extracted information is stored securely in our database for easy searching and retrieval.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-shield-check"></i> Privacy</h6>
+                        <p class="small">Original files are automatically deleted after processing to protect your privacy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('upload-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('file');
+    const loadingDiv = document.getElementById('loading');
+    const resultDiv = document.getElementById('result');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    
+    // Validate file
+    if (!fileInput.files[0]) {
+        alert('Please select a file');
+        return;
+    }
+    
+    // Check file size (16MB limit)
+    if (fileInput.files[0].size > 16 * 1024 * 1024) {
+        alert('File size too large. Please select a file smaller than 16MB.');
+        return;
+    }
+    
+    // Show loading state
+    loadingDiv.style.display = 'block';
+    resultDiv.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    
+    // Upload file
+    fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        loadingDiv.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-upload"></i> Upload and Process';
+        
+        if (data.error) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle"></i> Error: ${data.error}
+                </div>
+            `;
+        } else {
+            const candidate = data.candidate;
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i> Resume processed successfully!
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Extracted Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6><strong>Name:</strong> ${candidate.name || 'Not detected'}</h6>
+                        <p><strong>Email:</strong> ${candidate.email || 'Not detected'}</p>
+                        <p><strong>Phone:</strong> ${candidate.phone || 'Not detected'}</p>
+                        <p><strong>Location:</strong> ${candidate.location || 'Not detected'}</p>
+                        
+                        ${candidate.skills.length > 0 ? `
+                            <div class="mt-3">
+                                <strong>Skills:</strong><br>
+                                ${candidate.skills.map(skill => 
+                                    `<span class="badge bg-primary skill-badge">${skill.name}</span>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${candidate.educations.length > 0 ? `
+                            <div class="mt-3">
+                                <strong>Education:</strong>
+                                ${candidate.educations.map(edu => 
+                                    `<div class="mt-2">
+                                        <div>${edu.degree || 'Degree'} ${edu.field_of_study ? 'in ' + edu.field_of_study : ''}</div>
+                                        <div class="text-muted">${edu.institution || 'Institution'} ${edu.start_date ? '(' + edu.start_date + (edu.end_date ? ' - ' + edu.end_date : '') + ')' : ''}</div>
+                                    </div>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${candidate.experiences.length > 0 ? `
+                            <div class="mt-3">
+                                <strong>Experience:</strong>
+                                ${candidate.experiences.map(exp => 
+                                    `<div class="mt-2">
+                                        <div>${exp.job_title || 'Position'} at ${exp.company || 'Company'}</div>
+                                        <div class="text-muted">${exp.start_date ? exp.start_date + (exp.end_date ? ' - ' + exp.end_date : exp.is_current ? ' - Present' : '') : ''}</div>
+                                    </div>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="mt-3">
+                            <a href="/candidate/${candidate.id}" class="btn btn-primary">
+                                <i class="bi bi-eye"></i> View Full Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        resultDiv.style.display = 'block';
+    })
+    .catch(error => {
+        loadingDiv.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-upload"></i> Upload and Process';
+        
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle"></i> An error occurred while processing the resume. Please try again.
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+    });
+});
+</script>
+{% endblock %}

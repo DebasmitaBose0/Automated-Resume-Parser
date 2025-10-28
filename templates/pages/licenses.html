@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Open Licenses - Automated Resume Parser{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-hero">
+        <div class="container">
+            <h1 class="page-title">Open Source Licenses</h1>
+            <p class="page-subtitle">Libraries and frameworks we use</p>
+        </div>
+    </div>
+
+    <section class="content-section">
+        <div class="container">
+            <div class="licenses-content">
+                <h2>Our Technology Stack</h2>
+                
+                <h3>Backend</h3>
+                <ul>
+                    <li>Flask - BSD License</li>
+                    <li>SQLAlchemy - MIT License</li>
+                    <li>Python - Python Software Foundation License</li>
+                </ul>
+                
+                <h3>Frontend</h3>
+                <ul>
+                    <li>Bootstrap - MIT License</li>
+                    <li>Font Awesome - CC BY 4.0 License</li>
+                </ul>
+                
+                <h3>Libraries</h3>
+                <ul>
+                    <li>NLTK - Apache License 2.0</li>
+                    <li>pdfplumber - MIT License</li>
+                    <li>python-docx - MIT License</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
